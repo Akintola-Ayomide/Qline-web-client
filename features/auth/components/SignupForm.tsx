@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { authApi } from '../services/auth.api';
 import { SignupDTO } from '../types';
+import { GoogleLoginButton } from './GoogleLoginButton';
 
 interface SignupFormProps {
     onSwitchToLogin: () => void;
@@ -111,6 +112,23 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
                 >
                     Sign Up
                 </Button>
+
+                <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <div className="grid gap-2">
+                    <GoogleLoginButton
+                        text="Sign up with Google"
+                        onClick={() => alert('Google Signup Clicked - Logic to be implemented')}
+                        isLoading={isLoading}
+                    />
+                </div>
             </form>
 
             <div className="text-center text-sm">

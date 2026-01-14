@@ -5,6 +5,7 @@ import { Input } from '@/shared/ui/input';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { authApi } from '../services/auth.api';
 import { LoginDTO } from '../types';
+import { GoogleLoginButton } from './GoogleLoginButton';
 
 interface LoginFormProps {
     onSwitchToSignup: () => void;
@@ -115,6 +116,19 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
                 >
                     Log In
                 </Button>
+
+                <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <div className="grid gap-2">
+                    <GoogleLoginButton onClick={() => alert('Google Login Clicked - Logic to be implemented')} isLoading={isLoading} />
+                </div>
             </form>
 
             <div className="text-center text-sm">

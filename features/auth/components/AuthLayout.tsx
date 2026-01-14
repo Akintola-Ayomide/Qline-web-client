@@ -9,24 +9,35 @@ export function AuthLayout({ children }: AuthLayoutProps) {
     return (
         <div className="flex min-h-screen w-full">
             {/* Left Branding Section */}
-            <div className="hidden lg:flex w-1/2 flex-col justify-between bg-gradient-to-br from-blue-50 to-indigo-50 p-12 text-blue-900 relative overflow-hidden">
+            <div className="hidden lg:flex w-1/2 flex-col justify-between bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 p-12 text-blue-900 relative overflow-hidden">
                 {/* Logo */}
-                <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
-                    <CircleAlert className="text-blue-700 h-6 w-6" />
-                    <span>Qline</span>
+                <div className="flex items-baseline relative z-10">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 font-momo text-7xl italic font-extrabold leading-none select-none mr-0.5 md:mr-1 drop-shadow-sm">
+                        Q
+                    </span>
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">line</span>
                 </div>
 
                 {/* Hero Content */}
-                <div className="flex flex-col items-center text-center max-w-lg mx-auto z-10">
-                    <div className="mb-8 p-4 bg-white/20 backdrop-blur-sm rounded-full border border-white/40 shadow-xl">
-                        <CircleAlert className="h-16 w-16 text-blue-700" strokeWidth={2.5} />
+                <div className="flex flex-col items-center text-center max-w-lg mx-auto z-10 relative">
+                    {/* Decorative Elements behind Q */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-400/20 rounded-full blur-[100px] pointer-events-none" />
+
+                    <div className="mb-8 relative group">
+                        <div className="absolute inset-0 bg-blue-600 rounded-[2rem] rotate-6 opacity-20 blur-xl group-hover:rotate-12 transition-transform duration-500" />
+                        <div className="relative flex items-center justify-center w-32 h-32 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white/60 shadow-2xl shadow-blue-900/5 group-hover:-translate-y-2 transition-transform duration-500">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 font-momo text-7xl italic font-extrabold leading-none select-none">
+                                Q
+                            </span>
+                        </div>
                     </div>
 
-                    <h1 className="text-4xl font-bold tracking-tight mb-6 text-gray-900">
-                        Smart Queue<br />Management
+                    <h1 className="text-5xl font-bold tracking-tight mb-6 text-slate-900 drop-shadow-sm">
+                        Smart Queue<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Management</span>
                     </h1>
 
-                    <p className="text-lg text-slate-600 leading-relaxed font-medium">
+                    <p className="text-lg text-slate-600 leading-relaxed font-medium text-balance">
                         Streamline operations, enhance customer experience, and unlock efficiency with our intelligent queuing solutions.
                     </p>
                 </div>
@@ -44,15 +55,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <div className="flex-1 flex flex-col justify-center items-center p-8 bg-white relative">
                 <div className="w-full max-w-md space-y-8">
                     {children}
-                </div>
-
-                {/* Mobile Footer Links (if needed) or General Footer */}
-                <div className="absolute bottom-6 right-8 flex gap-6 text-sm text-gray-500">
-                    <a href="#" className="hover:text-blue-600">Terms of Service</a>
-                    <a href="#" className="hover:text-blue-600">Privacy Policy</a>
-                </div>
-                <div className="lg:hidden absolute bottom-6 left-8 text-sm text-gray-500">
-                    © 2024 Qline
                 </div>
             </div>
         </div>
