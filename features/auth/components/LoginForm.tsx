@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Checkbox } from '@/shared/ui/checkbox';
-import { authApi } from '../services/auth.api';
+import { useAuth } from '../context/auth-context';
 import { LoginDTO } from '../types';
 import { GoogleLoginButton } from './GoogleLoginButton';
 
@@ -12,7 +12,13 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
+    const { login, isLoading: isAuthLoading, loginWithGoogle } = useAuth();
+    // Local loading state for form submission specifically (although access to global isLoading is available, 
+    // it handles initial check. We need form submission loading.)
+    // Actually, useAuth could expose a general loading, but let's keep local loading for the button 
+    // or use the promise returned by login().
     const [isLoading, setIsLoading] = React.useState(false);
+
     const [showPassword, setShowPassword] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
@@ -27,11 +33,14 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
         setIsLoading(true);
 
         try {
-            await authApi.login(formData);
-            // In a real app, we'd redirect or refresh user context here
+            await login(formData);
+            // Redirect or UI update logic here?
+            // For now, simple alert as placeholder for navigation
+            // In a real app, use router.push('/dashboard')
+            // navigate to dashboard
             alert('Login Successful!');
-        } catch (err) {
-            setError('Invalid credentials. Please try again.');
+        } catch (err: any) {
+            setError(err.message || 'Invalid credentials. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -127,7 +136,7 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
                 </div>
 
                 <div className="grid gap-2">
-                    <GoogleLoginButton onClick={() => alert('Google Login Clicked - Logic to be implemented')} isLoading={isLoading} />
+                    <GoogleLoginButton onClick={loginWithGoogle} isLoading={isLoading || isAuthLoading} />
                 </div>
             </form>
 

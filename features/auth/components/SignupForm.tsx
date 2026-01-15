@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { authApi } from '../services/auth.api';
+import { useAuth } from '../context/auth-context';
 import { SignupDTO } from '../types';
 import { GoogleLoginButton } from './GoogleLoginButton';
 
@@ -11,6 +11,7 @@ interface SignupFormProps {
 }
 
 export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
+    const { signup, isLoading: isAuthLoading, loginWithGoogle } = useAuth();
     const [isLoading, setIsLoading] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -27,16 +28,11 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
         setIsLoading(true);
 
         try {
-            await authApi.signup(formData);
-            // On success, maybe switch back to login or auto-login
-            // Requirement: "Clicking “Log In” switches UI to logIn state on success" 
-            // (This quote was for the OTHER direction or this one? "Clicking “Log In” switches UI to logIn state on success" is for the Log In button?
-            // "Clicking “SignUp” switches UI back to signUp state"
-            // Interpretation: Submit signup -> Success -> maybe auto login or show generic success.
+            await signup(formData);
             alert('Account created! Please log in.');
             onSwitchToLogin();
-        } catch (err) {
-            setError('Could not create account. Please try again.');
+        } catch (err: any) {
+            setError(err.message || 'Could not create account. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -125,8 +121,8 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
                 <div className="grid gap-2">
                     <GoogleLoginButton
                         text="Sign up with Google"
-                        onClick={() => alert('Google Signup Clicked - Logic to be implemented')}
-                        isLoading={isLoading}
+                        onClick={loginWithGoogle}
+                        isLoading={isLoading || isAuthLoading}
                     />
                 </div>
             </form>

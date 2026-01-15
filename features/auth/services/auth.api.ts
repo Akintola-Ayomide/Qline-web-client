@@ -1,55 +1,82 @@
-import { LoginDTO, SignupDTO, AuthResponse } from '../types';
+import { LoginDTO, SignupDTO, AuthResponse, User } from '../types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.example.com';
-const USE_MOCK = true; // For demonstration purposes
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-async function mockDelay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+export class ApiError extends Error {
+    constructor(
+        public statusCode: number,
+        public message: string,
+        public code?: string,
+        public fieldErrors?: Record<string, string[]>
+    ) {
+        super(message);
+        this.name = 'ApiError';
+    }
 }
 
-export const authApi = {
-    login: async (data: LoginDTO): Promise<AuthResponse> => {
-        if (USE_MOCK) {
-            await mockDelay(1500);
-            // Simulate success
-            return {
-                user: { id: '1', name: 'Demo User', email: data.email },
-                token: 'mock-jwt-token',
-            };
-        }
+class AuthService {
+    private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...(options.headers as Record<string, string> || {}),
+        };
 
-        const response = await fetch(`${API_BASE}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers,
+            credentials: 'include', // Ensure cookies are sent/received
         });
 
         if (!response.ok) {
-            throw new Error('Login failed');
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                errorData = { message: 'An unexpected error occurred' };
+            }
+
+            throw new ApiError(
+                response.status,
+                errorData.message || 'API request failed',
+                errorData.code,
+                errorData.errors // Assuming backend might send validation errors here
+            );
         }
 
         return response.json();
-    },
+    }
 
-    signup: async (data: SignupDTO): Promise<AuthResponse> => {
-        if (USE_MOCK) {
-            await mockDelay(1500);
-            return {
-                user: { id: '2', name: data.username, email: data.email },
-                token: 'mock-jwt-token',
-            };
-        }
-
-        const response = await fetch(`${API_BASE}/auth/signup`, {
+    async login(data: LoginDTO): Promise<AuthResponse> {
+        return this.request<AuthResponse>('/auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
+    }
 
-        if (!response.ok) {
-            throw new Error('Signup failed');
+    async signup(data: SignupDTO): Promise<AuthResponse> {
+        return this.request<AuthResponse>('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async getProfile(): Promise<User> {
+        return this.request<User>('/auth/profile');
+    }
+
+    async logout(): Promise<void> {
+        // Best effort logout. Even if it fails, client clears state.
+        try {
+            await this.request('/auth/logout', { method: 'POST' });
+        } catch (e) {
+            console.warn('Logout failed on server', e);
         }
+    }
 
-        return response.json();
-    },
-};
+    initiateGoogleLogin() {
+        window.location.href = `${API_BASE}/auth/google`;
+    }
+}
+
+export const authApi = new AuthService();
+

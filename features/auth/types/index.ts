@@ -17,7 +17,7 @@ export interface SignupDTO {
 
 export interface AuthResponse {
     user: User;
-    token: string;
+    token?: string;
 }
 
 export type AuthMode = 'login' | 'signup';
