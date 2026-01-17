@@ -5,8 +5,8 @@
 ## 🚀 Key Features
 
 ### 🔐 Authentication & Security
-- **Secure Cookie-Based Auth**: Fully implemented HTTP-only cookie authentication for maximum security.
-- **Google OAuth Integration**: Native-feel "Continue with Google" flow integrated directly into the login/signup experience.
+- **Secure Cookie-Based Auth**: Fully implemented HTTP-only cookie authentication for maximum security (XSS protection).
+- **Google OAuth Integration**: Native-feel "Continue with Google" flow with a dedicated loading state and callback handling (`/auth/callback`).
 - **Robust State Management**: Global `AuthProvider` context managing user sessions, loading states, and automatic profile fetching.
 - **Advanced Error Handling**: Custom `ApiError` class handling structured backend errors, providing clear feedback to users (e.g., validation issues, invalid credentials).
 
@@ -35,6 +35,8 @@
 ```
 web-frontend/
 ├── app/                  # Next.js App Router (Pages & Layouts)
+│   ├── auth/             # Auth pages (e.g., Callback)
+│   └── page.tsx          # Home page (with conditional Auth UI)
 ├── features/             # Feature-based modules
 │   └── auth/
 │       ├── components/   # Auth UI (LoginForm, SignupForm, Layout)
@@ -74,11 +76,12 @@ web-frontend/
     Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🔗 Backend Connect
-This frontend is designed to consume a standard REST API.
+This frontend is designed to consume a standard REST API with secure cookie support.
 - **Base URL**: Configurable via `.env`
+- **Auth Flow**: Uses `credentials: 'include'` for all requests to ensure HttpOnly cookies are passed.
 - **Auth Endpoints**:
-    - `POST /auth/login`
-    - `POST /auth/register`
-    - `POST /auth/logout`
+    - `POST /auth/login` (Returns 200 + Set-Cookie)
+    - `POST /auth/register` (Returns 200 + Set-Cookie)
+    - `POST /auth/logout` (Clears Cookies)
     - `GET /auth/profile`
-    - `GET /auth/google`
+    - `GET /auth/google` (Redirects to Provider)

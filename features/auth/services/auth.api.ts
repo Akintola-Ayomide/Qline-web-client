@@ -54,9 +54,14 @@ class AuthService {
     }
 
     async signup(data: SignupDTO): Promise<AuthResponse> {
+        // Map frontend DTO (username) to backend DTO (name)
+        const payload = {
+            ...data,
+            name: data.username,
+        };
         return this.request<AuthResponse>('/auth/register', {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
     }
 
