@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
 import { motion, Variants } from 'framer-motion';
+import { useAuth } from '@/features/auth/context/auth-context';
 
 export function HeroSection() {
+    const { user, isLoading } = useAuth();
+
     const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
@@ -170,13 +173,13 @@ export function HeroSection() {
                             className="flex flex-wrap gap-4"
                             variants={itemVariants}
                         >
-                            <Link href="/auth">
+                            <Link href={user && !isLoading ? "/dashboard" : "/auth"}>
                                 <motion.div
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
                                     <Button variant="primary" size="lg" className="group">
-                                        Get Started Free
+                                        {user && !isLoading ? "Go to Dashboard" : "Get Started Free"}
                                         <svg
                                             className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1"
                                             fill="none"
