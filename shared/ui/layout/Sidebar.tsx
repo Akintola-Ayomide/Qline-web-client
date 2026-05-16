@@ -31,11 +31,11 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white flex flex-col">
             {/* Logo */}
             <div className="flex h-16 items-center border-b border-gray-200 px-6 shrink-0">
-                <Link href="/dashboard" className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm">
+                <Link href="/dashboard" className="flex items-baseline group">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 font-momo text-4xl italic font-extrabold leading-none select-none mr-0.5 md:mr-1 drop-shadow-sm group-hover:scale-105 transition-transform">
                         Q
-                    </div>
-                    <span className="font-bold text-xl text-gray-900">Qline</span>
+                    </span>
+                    <span className="text-xl font-bold tracking-tight text-slate-900">line</span>
                 </Link>
             </div>
 

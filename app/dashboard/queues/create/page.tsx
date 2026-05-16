@@ -8,20 +8,19 @@ import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { queueApi, CreateQueueDto } from "@/features/Queue/services/queue.api"
 
-const QUEUE_TYPES = ["Single Line", "Multi-Counter", "Appointment-Based", "Virtual"]
+const MAX_PARTICIPANTS = 1000;
 
 export default function CreateQueuePage() {
     const router = useRouter()
     const [isLoading, setIsLoading] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    const [form, setForm] = React.useState<CreateQueueDto & { queueType: string }>({
+    const [form, setForm] = React.useState<CreateQueueDto>({
         name: "",
         description: "",
         maxParticipants: 50,
         avgServiceTime: 5,
         customFields: [],
-        queueType: "Single Line",
     })
 
     const [newFieldLabel, setNewFieldLabel] = React.useState("")
@@ -32,8 +31,7 @@ export default function CreateQueuePage() {
         setIsLoading(true)
         setError(null)
         try {
-            const { queueType, ...dto } = form
-            await queueApi.createQueue(dto)
+            await queueApi.createQueue(form)
             router.push("/dashboard/queues")
         } catch (err: any) {
             setError(err.message ?? "Failed to create queue")
@@ -126,16 +124,15 @@ export default function CreateQueuePage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Queue Type</label>
-                            <select
-                                value={form.queueType}
-                                onChange={(e) => setForm({ ...form, queueType: e.target.value })}
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Max Participants</label>
+                            <input
+                                type="number"
+                                min={1}
+                                max={MAX_PARTICIPANTS}
+                                value={form.maxParticipants}
+                                onChange={(e) => setForm({ ...form, maxParticipants: parseInt(e.target.value) || 50 })}
                                 className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                            >
-                                {QUEUE_TYPES.map((t) => (
-                                    <option key={t} value={t}>{t}</option>
-                                ))}
-                            </select>
+                            />
                         </div>
 
                         <div>
@@ -151,16 +148,6 @@ export default function CreateQueuePage() {
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Max Participants</label>
-                            <input
-                                type="number"
-                                min={1}
-                                value={form.maxParticipants}
-                                onChange={(e) => setForm({ ...form, maxParticipants: parseInt(e.target.value) || 50 })}
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                            />
-                        </div>
                     </div>
                 </div>
 

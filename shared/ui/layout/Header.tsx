@@ -32,24 +32,6 @@ export function Header() {
             <h1 className="text-xl font-bold text-gray-900">{title}</h1>
 
             <div className="flex items-center gap-4">
-                {/* Search */}
-                <div className="relative hidden sm:block">
-                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                    <input
-                        type="text"
-                        placeholder="Search…"
-                        className="h-10 w-56 rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                    />
-                </div>
-
-                {/* Create Queue CTA */}
-                <Link href="/dashboard/queues/create">
-                    <Button className="gap-2 hidden sm:inline-flex">
-                        <Plus className="h-4 w-4" />
-                        New Queue
-                    </Button>
-                </Link>
-
                 {/* Notifications */}
                 <button className="relative rounded-lg p-2 text-gray-500 hover:bg-gray-100 transition-colors">
                     <Bell className="h-5 w-5" />
