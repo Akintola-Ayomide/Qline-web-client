@@ -3,12 +3,13 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, BarChart3, Settings, LogOut, HelpCircle } from "lucide-react"
+import { LayoutDashboard, Users, BarChart3, Settings, LogOut, HelpCircle, Search } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { useAuth } from "@/features/auth/context/auth-context"
 
 const NAV_ITEMS = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Browse Queues", href: "/browse", icon: Search },
     { name: "Queues", href: "/dashboard/queues", icon: Users },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
