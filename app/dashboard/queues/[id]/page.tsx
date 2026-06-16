@@ -278,21 +278,23 @@ export default function ManageQueuePage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:ml-0 ml-12">
           <Button 
             onClick={handleOpenScanner} 
             variant="secondary" 
             className="gap-2 text-xs font-bold uppercase shrink-0"
           >
             <Camera className="h-4 w-4 text-muted-foreground" />
-            Verify QR Ticket
+            <span className="hidden sm:inline">Verify QR Ticket</span>
+            <span className="sm:hidden">Verify</span>
           </Button>
           <Button 
             onClick={() => { setShowAddGuest(true); setAddGuestError(null); }} 
             className="gap-2 text-xs font-bold uppercase shrink-0"
           >
             <Plus className="h-4 w-4" />
-            Add Walk-in
+            <span className="hidden sm:inline">Add Walk-in</span>
+            <span className="sm:hidden">Walk-in</span>
           </Button>
         </div>
       </div>
@@ -319,7 +321,7 @@ export default function ManageQueuePage() {
             {queueActive ? "Active / Open" : "Paused"}
           </span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center relative z-10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center relative z-10">
           <div className="bg-secondary/40 border border-border/50 rounded-md py-3.5 px-2">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Waiting</p>
             <p className="text-2xl font-display font-black text-primary tracking-tight">{activeCount}</p>
@@ -395,11 +397,11 @@ export default function ManageQueuePage() {
             {participants.map((p, idx) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between rounded-md bg-background p-4 border border-border/80 shadow-xs hover:border-primary/30 transition-colors"
+                className="flex items-center justify-between rounded-md bg-background p-3 sm:p-4 border border-border/80 shadow-xs hover:border-primary/30 transition-colors gap-3"
               >
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border font-display font-black text-sm ${
+                    className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md border font-display font-black text-sm ${
                       idx === 0 
                         ? "bg-primary text-primary-foreground border-primary" 
                         : "bg-secondary text-foreground border-border/60"
@@ -417,7 +419,7 @@ export default function ManageQueuePage() {
                     setTargetPosition(p.position);
                     setPrioritizingEntry(p);
                   }}
-                  className="rounded-md bg-secondary border border-border/60 p-2 text-muted-foreground hover:text-foreground transition-all cursor-pointer hover:bg-background"
+                  className="rounded-md bg-secondary border border-border/60 p-2 text-muted-foreground hover:text-foreground transition-all cursor-pointer hover:bg-background shrink-0"
                   title="Prioritize / Move User"
                 >
                   <EllipsisVertical className="h-4 w-4" />

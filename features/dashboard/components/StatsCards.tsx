@@ -41,7 +41,7 @@ export function StatsCards({ queues }: { queues: Queue[] }) {
     ]
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
             {STATS.map((stat, index) => {
                 const isPositive = stat.trend === "up"
                 const TrendIcon = isPositive ? TrendingUp : TrendingDown

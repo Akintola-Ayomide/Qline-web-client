@@ -77,44 +77,45 @@ export default function QueuesPage() {
                     <h1 className="text-xl font-display font-bold text-foreground tracking-tight">My Queues</h1>
                     <p className="text-muted-foreground text-xs font-medium mt-0.5">Monitor and manage your active queues in real-time.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="relative flex-1 sm:flex-none">
                         <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                         <input
                             type="text"
                             placeholder="Search queues…"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="h-10 w-56 rounded-md border border-border bg-secondary pl-9 pr-4 text-xs font-medium text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-background transition-all"
+                            className="h-10 w-full sm:w-48 md:w-56 rounded-md border border-border bg-secondary pl-9 pr-4 text-xs font-medium text-foreground placeholder:text-muted-foreground/60 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-background transition-all"
                         />
                     </div>
                     <button
                         onClick={fetchQueues}
-                        className="h-10 w-10 flex items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-secondary transition-colors cursor-pointer"
+                        className="h-10 w-10 flex items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:bg-secondary transition-colors cursor-pointer shrink-0"
                         title="Refresh"
                     >
                         <RefreshCw className="h-4 w-4" />
                     </button>
-                    <Link href="/dashboard/queues/create">
-                        <Button className="gap-2 text-xs font-bold">
+                    <Link href="/dashboard/queues/create" className="shrink-0">
+                        <Button className="gap-2 text-xs font-bold whitespace-nowrap">
                             <Plus className="h-4 w-4" />
-                            Create Queue
+                            <span className="hidden xs:inline">Create Queue</span>
+                            <span className="xs:hidden">Create</span>
                         </Button>
                     </Link>
                 </div>
             </div>
 
             {/* Filters Bar */}
-            <div className="flex items-center justify-between rounded-md border border-border bg-secondary/30 p-3 gap-3 flex-wrap">
-                <div className="flex items-center gap-2">
-                    <Filter className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-xs font-bold tracking-wide uppercase text-muted-foreground/80 mr-1.5">Status:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-md border border-border bg-secondary/30 p-3 gap-3">
+                <div className="flex items-center flex-wrap gap-2">
+                    <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="text-xs font-bold tracking-wide uppercase text-muted-foreground/80">Status:</span>
                     {(["all", "active", "paused", "closed"] as const).map((s) => (
                         <button
                             key={s}
                             onClick={() => setStatusFilter(s)}
                             className={cn(
-                                "rounded-md px-3 py-1 text-xs font-semibold transition-colors capitalize cursor-pointer",
+                                "rounded-md px-3 py-1 text-xs font-semibold transition-colors capitalize cursor-pointer whitespace-nowrap",
                                 statusFilter === s
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-background border border-border text-muted-foreground hover:bg-secondary"
@@ -124,7 +125,7 @@ export default function QueuesPage() {
                         </button>
                     ))}
                 </div>
-                <span className="text-xs font-semibold text-muted-foreground">{filtered.length} queue{filtered.length !== 1 ? "s" : ""}</span>
+                <span className="text-xs font-semibold text-muted-foreground shrink-0">{filtered.length} queue{filtered.length !== 1 ? "s" : ""}</span>
             </div>
 
             {/* Main Content Grid */}
@@ -149,71 +150,138 @@ export default function QueuesPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="rounded-md border border-border bg-background shadow-xs overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                        <thead className="bg-secondary/40 text-muted-foreground font-display text-[10px] font-bold tracking-wider uppercase border-b border-border/80">
-                            <tr>
-                                <th className="px-6 py-3.5">Queue Name</th>
-                                <th className="px-6 py-3.5">Status</th>
-                                <th className="px-6 py-3.5">Waiting</th>
-                                <th className="px-6 py-3.5">Total Today</th>
-                                <th className="px-6 py-3.5">Avg. Wait</th>
-                                <th className="px-6 py-3.5">Capacity</th>
-                                <th className="px-6 py-3.5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/60">
-                            {filtered.map((queue) => {
-                                const waiting = queue.activeParticipants ?? queue.inLine ?? 0
-                                const pct = Math.min((waiting / queue.maxParticipants) * 100, 100)
-                                return (
-                                    <tr key={queue.id} className="hover:bg-secondary/35 transition-colors">
-                                        <td className="px-6 py-4 font-semibold text-foreground">
-                                            <div>{queue.name}</div>
-                                            {queue.description && (
-                                                <div className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate max-w-xs">{queue.description}</div>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4"><StatusBadge status={queue.status} /></td>
-                                        <td className="px-6 py-4 text-muted-foreground font-semibold">{waiting}</td>
-                                        <td className="px-6 py-4 text-muted-foreground font-semibold">{queue.totalToday ?? "—"}</td>
-                                        <td className="px-6 py-4 text-muted-foreground font-semibold">{avgWait(queue)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="h-1.5 w-20 rounded-full bg-secondary border border-border/20 overflow-hidden">
-                                                    <div
-                                                        className={cn("h-full rounded-full transition-all", pct > 80 ? "bg-destructive" : "bg-primary")}
-                                                        style={{ width: `${pct}%` }}
-                                                    />
-                                                </div>
-                                                <span className="text-[10px] font-bold text-muted-foreground">{waiting}/{queue.maxParticipants}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                {queue.status !== "closed" && (
-                                                    <button
-                                                        onClick={() => handleStatusToggle(queue)}
-                                                        disabled={updatingId === queue.id}
-                                                        className="text-xs px-2.5 py-1 rounded-md border border-border text-foreground hover:bg-secondary disabled:opacity-50 transition-colors font-medium cursor-pointer h-7"
-                                                    >
-                                                        {updatingId === queue.id ? <Loader2 className="h-3 w-3 animate-spin" /> : queue.status === "active" ? "Pause" : "Resume"}
-                                                    </button>
+                <>
+                    {/* Desktop Table */}
+                    <div className="hidden md:block rounded-md border border-border bg-background shadow-xs overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse">
+                            <thead className="bg-secondary/40 text-muted-foreground font-display text-[10px] font-bold tracking-wider uppercase border-b border-border/80">
+                                <tr>
+                                    <th className="px-6 py-3.5">Queue Name</th>
+                                    <th className="px-6 py-3.5">Status</th>
+                                    <th className="px-6 py-3.5">Waiting</th>
+                                    <th className="px-6 py-3.5">Total Today</th>
+                                    <th className="px-6 py-3.5">Avg. Wait</th>
+                                    <th className="px-6 py-3.5">Capacity</th>
+                                    <th className="px-6 py-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/60">
+                                {filtered.map((queue) => {
+                                    const waiting = queue.activeParticipants ?? queue.inLine ?? 0
+                                    const pct = Math.min((waiting / queue.maxParticipants) * 100, 100)
+                                    return (
+                                        <tr key={queue.id} className="hover:bg-secondary/35 transition-colors">
+                                            <td className="px-6 py-4 font-semibold text-foreground">
+                                                <div>{queue.name}</div>
+                                                {queue.description && (
+                                                    <div className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate max-w-xs">{queue.description}</div>
                                                 )}
-                                                <Link
-                                                    href={`/dashboard/queues/${queue.id}`}
-                                                    className="text-xs px-2.5 py-1.5 rounded-md bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 font-bold uppercase tracking-wider transition-colors h-7 flex items-center"
-                                                >
-                                                    Manage
-                                                </Link>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                            </td>
+                                            <td className="px-6 py-4"><StatusBadge status={queue.status} /></td>
+                                            <td className="px-6 py-4 text-muted-foreground font-semibold">{waiting}</td>
+                                            <td className="px-6 py-4 text-muted-foreground font-semibold">{queue.totalToday ?? "—"}</td>
+                                            <td className="px-6 py-4 text-muted-foreground font-semibold">{avgWait(queue)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="h-1.5 w-20 rounded-full bg-secondary border border-border/20 overflow-hidden">
+                                                        <div
+                                                            className={cn("h-full rounded-full transition-all", pct > 80 ? "bg-destructive" : "bg-primary")}
+                                                            style={{ width: `${pct}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground">{waiting}/{queue.maxParticipants}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {queue.status !== "closed" && (
+                                                        <button
+                                                            onClick={() => handleStatusToggle(queue)}
+                                                            disabled={updatingId === queue.id}
+                                                            className="text-xs px-2.5 py-1 rounded-md border border-border text-foreground hover:bg-secondary disabled:opacity-50 transition-colors font-medium cursor-pointer h-7"
+                                                        >
+                                                            {updatingId === queue.id ? <Loader2 className="h-3 w-3 animate-spin" /> : queue.status === "active" ? "Pause" : "Resume"}
+                                                        </button>
+                                                    )}
+                                                    <Link
+                                                        href={`/dashboard/queues/${queue.id}`}
+                                                        className="text-xs px-2.5 py-1.5 rounded-md bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 font-bold uppercase tracking-wider transition-colors h-7 flex items-center"
+                                                    >
+                                                        Manage
+                                                    </Link>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Card List */}
+                    <div className="md:hidden grid gap-3">
+                        {filtered.map((queue) => {
+                            const waiting = queue.activeParticipants ?? queue.inLine ?? 0
+                            const pct = Math.min((waiting / queue.maxParticipants) * 100, 100)
+                            return (
+                                <div key={queue.id} className="bg-background border border-border/80 rounded-md p-4 shadow-xs">
+                                    <div className="flex items-start justify-between gap-3 mb-3">
+                                        <div className="min-w-0">
+                                            <p className="font-semibold text-foreground text-sm truncate">{queue.name}</p>
+                                            {queue.description && (
+                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">{queue.description}</p>
+                                            )}
+                                        </div>
+                                        <StatusBadge status={queue.status} />
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-2 mb-3">
+                                        <div className="bg-secondary/40 border border-border/50 rounded-md p-2 text-center">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Waiting</p>
+                                            <p className="text-base font-display font-black text-primary">{waiting}</p>
+                                        </div>
+                                        <div className="bg-secondary/40 border border-border/50 rounded-md p-2 text-center">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Served</p>
+                                            <p className="text-base font-display font-black text-foreground">{queue.totalToday ?? 0}</p>
+                                        </div>
+                                        <div className="bg-secondary/40 border border-border/50 rounded-md p-2 text-center">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Avg Wait</p>
+                                            <p className="text-base font-display font-black text-accent">{avgWait(queue)}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="h-1.5 flex-1 rounded-full bg-secondary border border-border/20 overflow-hidden">
+                                            <div
+                                                className={cn("h-full rounded-full transition-all", pct > 80 ? "bg-destructive" : "bg-primary")}
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                        </div>
+                                        <span className="text-[10px] font-bold text-muted-foreground shrink-0">{waiting}/{queue.maxParticipants}</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        {queue.status !== "closed" && (
+                                            <button
+                                                onClick={() => handleStatusToggle(queue)}
+                                                disabled={updatingId === queue.id}
+                                                className="flex-1 text-xs py-2 rounded-md border border-border text-foreground hover:bg-secondary disabled:opacity-50 transition-colors font-bold uppercase tracking-wider cursor-pointer"
+                                            >
+                                                {updatingId === queue.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mx-auto" /> : queue.status === "active" ? "Pause" : "Resume"}
+                                            </button>
+                                        )}
+                                        <Link
+                                            href={`/dashboard/queues/${queue.id}`}
+                                            className="flex-1 text-center text-xs py-2 rounded-md bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 font-bold uppercase tracking-wider transition-colors"
+                                        >
+                                            Manage
+                                        </Link>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </>
             )}
         </div>
     )

@@ -13,7 +13,7 @@ export default function AnalyticsPage() {
                     <h1 className="text-xl font-display font-bold text-foreground tracking-tight">Analytics & Reports</h1>
                     <p className="text-muted-foreground text-xs font-medium mt-0.5">Gain insights into your queue performance and customer behavior.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-2 text-xs font-bold text-foreground uppercase tracking-wide">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                         <span>Last 30 Days</span>

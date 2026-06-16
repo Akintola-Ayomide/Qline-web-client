@@ -152,12 +152,12 @@ export default function HelpPage() {
                     </h2>
                     
                     {/* Category Filter Pills */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         {["all", "Queues", "Operations", "Branding"].map((category) => (
                             <button
                                 key={category}
                                 onClick={() => setSelectedCategory(category)}
-                                className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                                className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors cursor-pointer whitespace-nowrap ${
                                     selectedCategory === category
                                         ? "bg-primary border-primary text-primary-foreground"
                                         : "bg-secondary border-border text-muted-foreground hover:text-foreground"

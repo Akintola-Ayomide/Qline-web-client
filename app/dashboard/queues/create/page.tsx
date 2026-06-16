@@ -170,7 +170,7 @@ export default function CreateQueuePage() {
                         <label className="font-display text-xs font-medium tracking-wide text-muted-foreground uppercase leading-none">
                             Business Image or Logo
                         </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                             <button
                                 type="button"
                                 onClick={() => setImageOption("none")}
@@ -361,11 +361,11 @@ export default function CreateQueuePage() {
                 )}
 
                 {/* Footer Actions */}
-                <div className="flex items-center justify-end gap-3 pt-2 pb-8">
-                    <Link href="/dashboard/queues">
-                        <Button variant="secondary" type="button" className="text-xs font-bold uppercase">Cancel</Button>
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2 pb-8">
+                    <Link href="/dashboard/queues" className="w-full sm:w-auto">
+                        <Button variant="secondary" type="button" className="w-full text-xs font-bold uppercase">Cancel</Button>
                     </Link>
-                    <Button type="submit" isLoading={isLoading} className="gap-2 min-w-[140px] text-xs font-bold uppercase">
+                    <Button type="submit" isLoading={isLoading} className="w-full sm:w-auto gap-2 min-w-[140px] text-xs font-bold uppercase">
                         {!isLoading && <Plus className="h-4 w-4" />}
                         Create Queue
                     </Button>

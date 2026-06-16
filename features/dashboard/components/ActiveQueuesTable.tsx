@@ -12,66 +12,112 @@ export function ActiveQueuesTable({ queues }: { queues: Queue[] }) {
                     No active queues found. Create one to get started.
                 </div>
             ) : (
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                        <thead className="bg-secondary/40 font-display text-[10px] font-bold tracking-wider text-muted-foreground border-b border-border/80 uppercase">
-                            <tr>
-                                <th className="px-6 py-3.5">Queue Name</th>
-                                <th className="px-6 py-3.5">Status</th>
-                                <th className="px-6 py-3.5 text-center">Waiting</th>
-                                <th className="px-6 py-3.5 text-center">Served Today</th>
-                                <th className="px-6 py-3.5">Capacity</th>
-                                <th className="px-6 py-3.5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/60">
-                            {queues.map((queue) => {
-                                const statusColor = queue.status === 'active' 
-                                    ? "bg-primary/10 text-primary border-primary/20" 
-                                    : queue.status === 'paused' 
-                                    ? "bg-accent/10 text-accent border-accent/20" 
-                                    : "bg-destructive/10 text-destructive border-destructive/20";
+                <>
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-sm text-left border-collapse">
+                            <thead className="bg-secondary/40 font-display text-[10px] font-bold tracking-wider text-muted-foreground border-b border-border/80 uppercase">
+                                <tr>
+                                    <th className="px-6 py-3.5">Queue Name</th>
+                                    <th className="px-6 py-3.5">Status</th>
+                                    <th className="px-6 py-3.5 text-center">Waiting</th>
+                                    <th className="px-6 py-3.5 text-center">Served Today</th>
+                                    <th className="px-6 py-3.5">Capacity</th>
+                                    <th className="px-6 py-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/60">
+                                {queues.map((queue) => {
+                                    const statusColor = queue.status === 'active' 
+                                        ? "bg-primary/10 text-primary border-primary/20" 
+                                        : queue.status === 'paused' 
+                                        ? "bg-accent/10 text-accent border-accent/20" 
+                                        : "bg-destructive/10 text-destructive border-destructive/20";
+                                        
+                                    const capacityRatio = Math.min((queue.activeParticipants || 0) / queue.maxParticipants, 1);
+                                    const capacityColor = capacityRatio > 0.8 
+                                        ? "bg-destructive" 
+                                        : capacityRatio > 0.5 
+                                        ? "bg-accent" 
+                                        : "bg-primary";
                                     
-                                const capacityRatio = Math.min((queue.activeParticipants || 0) / queue.maxParticipants, 1);
-                                const capacityColor = capacityRatio > 0.8 
-                                    ? "bg-destructive" 
-                                    : capacityRatio > 0.5 
-                                    ? "bg-accent" 
-                                    : "bg-primary";
-                                
-                                return (
-                                    <tr key={queue.id} className="hover:bg-secondary/35 transition-colors group">
-                                        <td className="px-6 py-4 font-semibold text-foreground">{queue.name}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center rounded-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${statusColor}`}>
-                                                <span className="mr-1.5 h-1 w-1 rounded-full bg-current" />
-                                                {queue.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-center text-muted-foreground font-semibold">{queue.activeParticipants || 0}</td>
-                                        <td className="px-6 py-4 text-center text-muted-foreground font-semibold">{queue.totalToday || 0}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-1.5 w-24 rounded-full bg-secondary overflow-hidden border border-border/20">
-                                                    <div
-                                                        className={`h-full rounded-full ${capacityColor}`}
-                                                        style={{ width: `${capacityRatio * 100}%` }}
-                                                    />
+                                    return (
+                                        <tr key={queue.id} className="hover:bg-secondary/35 transition-colors group">
+                                            <td className="px-6 py-4 font-semibold text-foreground">{queue.name}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex items-center rounded-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${statusColor}`}>
+                                                    <span className="mr-1.5 h-1 w-1 rounded-full bg-current" />
+                                                    {queue.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center text-muted-foreground font-semibold">{queue.activeParticipants || 0}</td>
+                                            <td className="px-6 py-4 text-center text-muted-foreground font-semibold">{queue.totalToday || 0}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-1.5 w-24 rounded-full bg-secondary overflow-hidden border border-border/20">
+                                                        <div
+                                                            className={`h-full rounded-full ${capacityColor}`}
+                                                            style={{ width: `${capacityRatio * 100}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground">{queue.activeParticipants || 0}/{queue.maxParticipants}</span>
                                                 </div>
-                                                <span className="text-[10px] font-bold text-muted-foreground">{queue.activeParticipants || 0}/{queue.maxParticipants}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <Link href={`/dashboard/queues/${queue.id}`} className="text-primary hover:text-primary/80 font-bold text-xs uppercase tracking-wide transition-colors">
-                                                Manage
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <Link href={`/dashboard/queues/${queue.id}`} className="text-primary hover:text-primary/80 font-bold text-xs uppercase tracking-wide transition-colors">
+                                                    Manage
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="md:hidden divide-y divide-border/60">
+                        {queues.map((queue) => {
+                            const statusColor = queue.status === 'active' 
+                                ? "bg-primary/10 text-primary border-primary/20" 
+                                : queue.status === 'paused' 
+                                ? "bg-accent/10 text-accent border-accent/20" 
+                                : "bg-destructive/10 text-destructive border-destructive/20";
+                            const capacityRatio = Math.min((queue.activeParticipants || 0) / queue.maxParticipants, 1);
+                            const capacityColor = capacityRatio > 0.8 ? "bg-destructive" : capacityRatio > 0.5 ? "bg-accent" : "bg-primary";
+                            return (
+                                <div key={queue.id} className="p-4 space-y-3">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <p className="font-semibold text-foreground text-sm">{queue.name}</p>
+                                        <span className={`inline-flex items-center rounded-sm border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider shrink-0 ${statusColor}`}>
+                                            <span className="mr-1 h-1 w-1 rounded-full bg-current" />
+                                            {queue.status}
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="bg-secondary/40 border border-border/50 rounded-md p-2 text-center">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Waiting</p>
+                                            <p className="text-lg font-display font-black text-primary">{queue.activeParticipants || 0}</p>
+                                        </div>
+                                        <div className="bg-secondary/40 border border-border/50 rounded-md p-2 text-center">
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Served Today</p>
+                                            <p className="text-lg font-display font-black text-foreground">{queue.totalToday || 0}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-1.5 flex-1 rounded-full bg-secondary overflow-hidden border border-border/20">
+                                            <div className={`h-full rounded-full ${capacityColor}`} style={{ width: `${capacityRatio * 100}%` }} />
+                                        </div>
+                                        <span className="text-[10px] font-bold text-muted-foreground shrink-0">{queue.activeParticipants || 0}/{queue.maxParticipants}</span>
+                                    </div>
+                                    <Link href={`/dashboard/queues/${queue.id}`} className="block text-center text-xs py-2 rounded-md bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 font-bold uppercase tracking-wider transition-colors">
+                                        Manage
+                                    </Link>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </>
             )}
         </div>
     )
