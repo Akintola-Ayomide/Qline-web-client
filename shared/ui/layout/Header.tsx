@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Bell } from "lucide-react"
+import { Bell, Menu } from "lucide-react"
 import { useAuth } from "@/features/auth/context/auth-context"
 import { ThemeToggle } from "@/features/landing/components/Header"
 
@@ -18,7 +18,7 @@ const ROUTE_TITLES: Record<string, string> = {
     "/dashboard/help": "Help & Support",
 }
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
     const { user } = useAuth()
     const pathname = usePathname()
 
@@ -29,8 +29,17 @@ export function Header() {
         : "?"
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background/80 backdrop-blur-md px-8">
-            <h1 className="text-lg font-display font-bold text-foreground tracking-tight">{title}</h1>
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background/80 backdrop-blur-md px-6 md:px-8">
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={onMenuClick}
+                    className="md:hidden flex items-center justify-center p-2 rounded-md border border-border bg-secondary hover:bg-background text-foreground transition-colors cursor-pointer shrink-0"
+                    aria-label="Open sidebar"
+                >
+                    <Menu className="h-4.5 w-4.5" />
+                </button>
+                <h1 className="text-lg font-display font-bold text-foreground tracking-tight">{title}</h1>
+            </div>
 
             <div className="flex items-center gap-4">
                 <ThemeToggle />

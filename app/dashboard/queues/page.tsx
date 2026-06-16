@@ -149,7 +149,7 @@ export default function QueuesPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="rounded-md border border-border bg-background shadow-xs overflow-hidden">
+                <div className="rounded-md border border-border bg-background shadow-xs overflow-x-auto">
                     <table className="w-full text-sm text-left border-collapse">
                         <thead className="bg-secondary/40 text-muted-foreground font-display text-[10px] font-bold tracking-wider uppercase border-b border-border/80">
                             <tr>
