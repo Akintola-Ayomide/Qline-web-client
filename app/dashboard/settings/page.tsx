@@ -2,13 +2,15 @@
 
 import * as React from "react"
 import { useAuth } from "@/features/auth/context/auth-context"
-import { UserCircle, Shield, Bell, Palette, Upload, Loader2, CheckCircle2 } from "lucide-react"
+import { UserCircle, Shield, Bell, Palette, Upload, Loader2, CheckCircle2, LogOut, AlertTriangle } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 
 export default function SettingsPage() {
-    const { user, isLoading } = useAuth()
+    const { user, isLoading, logout } = useAuth()
     const [activeTab, setActiveTab] = React.useState("profile")
+    const [isSigningOut, setIsSigningOut] = React.useState(false)
+    const [showSignOutConfirm, setShowSignOutConfirm] = React.useState(false)
     const [isSaving, setIsSaving] = React.useState(false)
     const [saved, setSaved] = React.useState(false)
 
@@ -34,6 +36,21 @@ export default function SettingsPage() {
         setIsSaving(false)
         setSaved(true)
         setTimeout(() => setSaved(false), 3000)
+    }
+
+    const handleSignOut = async () => {
+        if (!showSignOutConfirm) {
+            setShowSignOutConfirm(true)
+            // Auto-dismiss the confirmation after 5 seconds if user doesn't act
+            setTimeout(() => setShowSignOutConfirm(false), 5000)
+            return
+        }
+        setIsSigningOut(true)
+        try {
+            await logout()
+        } finally {
+            setIsSigningOut(false)
+        }
     }
 
     if (isLoading) {
@@ -187,6 +204,40 @@ export default function SettingsPage() {
                             </div>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* ── Danger Zone ─────────────────────────────────────────── */}
+            <div className="rounded-md border border-destructive/20 bg-destructive/5 p-5 shadow-xs relative overflow-hidden">
+                <div className="absolute inset-0 dot-grid opacity-[0.08] pointer-events-none" />
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                            <h3 className="text-sm font-display font-bold text-destructive tracking-tight">Sign Out</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                            {showSignOutConfirm
+                                ? "Are you sure? Click again to confirm sign out."
+                                : "You will be logged out of your current session on this device."}
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleSignOut}
+                        disabled={isSigningOut}
+                        className={`shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+                            showSignOutConfirm
+                                ? "bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
+                                : "bg-background text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/50"
+                        }`}
+                    >
+                        {isSigningOut ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                            <LogOut className="h-3.5 w-3.5" />
+                        )}
+                        <span>{showSignOutConfirm ? "Confirm Sign Out" : "Sign Out"}</span>
+                    </button>
                 </div>
             </div>
         </div>

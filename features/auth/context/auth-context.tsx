@@ -111,8 +111,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
      * Called by the `/auth/callback` page after a Google OAuth redirect.
      * The backend passes the JWT as a `?token=` query parameter for cross-domain
      * compatibility. This method stores the token and fetches the full profile.
+     *
+     * We set `isLoading = true` for the duration of the request so that any
+     * component watching `isLoading` (e.g. the callback page's second useEffect
+     * guard) doesn't mistakenly treat the in-progress state as "auth failed".
      */
     const handleGoogleCallback = async (token: string) => {
+        setIsLoading(true);
         setToken(token);
         try {
             const profile = await authApi.getProfile();
@@ -122,6 +127,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             clearToken();
             setUser(null);
             throw new Error('Failed to fetch profile after Google login');
+        } finally {
+            setIsLoading(false);
         }
     };
 

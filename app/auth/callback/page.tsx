@@ -16,9 +16,16 @@
  *    the dashboard.
  * 4. If no token is found in the URL, the context's `checkAuth` may still
  *    succeed via the HttpOnly cookie (same-domain / dev scenarios).
+ *
+ * Race-condition prevention
+ * ─────────────────────────
+ * A local `isProcessing` state is set to `true` as soon as a URL token is
+ * detected. This prevents the "cookie-fallback" useEffect from interpreting
+ * the mid-flight state (isLoading=false, user=null) as a genuine auth failure
+ * and prematurely redirecting to the error page.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/auth-context';
 import { Loader2 } from 'lucide-react';
@@ -30,6 +37,20 @@ function AuthCallbackInner() {
     const searchParams = useSearchParams();
     const handled = useRef(false);
 
+    /**
+     * `isProcessing` stays true for the entire OAuth token-exchange round-trip.
+     * It starts as true if a `?token=` param is present in the URL so that the
+     * cookie-fallback effect is blocked right from the very first render.
+     */
+    const [isProcessing, setIsProcessing] = useState(() => {
+        // Safely read searchParams during initialisation (client-only).
+        if (typeof window !== 'undefined') {
+            return new URLSearchParams(window.location.search).has('token');
+        }
+        return false;
+    });
+
+    // ── Effect 1: Handle cross-domain token in the URL ──────────────────────
     useEffect(() => {
         // Guard against running twice in React StrictMode
         if (handled.current) return;
@@ -37,8 +58,8 @@ function AuthCallbackInner() {
         const token = searchParams.get('token');
 
         if (token) {
-            // Cross-domain flow: token was passed in the URL by the backend.
             handled.current = true;
+            setIsProcessing(true);
 
             // Remove the token from the URL immediately (don't leave it in browser history).
             window.history.replaceState({}, '', '/auth/callback');
@@ -48,18 +69,22 @@ function AuthCallbackInner() {
                     router.replace('/dashboard');
                 })
                 .catch(() => {
+                    setIsProcessing(false);
                     router.replace('/auth?error=google_failed');
                 });
         }
-        // If no token in URL, wait for the context's own checkAuth to complete
-        // (it will succeed if the HttpOnly cookie was set by the backend on the same domain).
     }, [searchParams, handleGoogleCallback, router]);
 
-    // Once the context has resolved without a URL token, check the result.
+    // ── Effect 2: Cookie-fallback (same-domain / dev) ───────────────────────
+    // Only activate when:
+    //   • We are NOT processing a URL token (isProcessing = false)
+    //   • The URL has no token param
+    //   • The AuthProvider has finished its initial checkAuth (isLoading = false)
     useEffect(() => {
         if (handled.current) return;  // Already handled via URL token above
+        if (isProcessing) return;     // URL-token flow is in progress
         const token = searchParams.get('token');
-        if (token) return;            // Will be handled by the effect above
+        if (token) return;            // Will be handled by Effect 1
 
         if (!isLoading) {
             if (user) {
@@ -69,7 +94,7 @@ function AuthCallbackInner() {
                 router.replace('/auth?error=google_failed');
             }
         }
-    }, [user, isLoading, router, searchParams]);
+    }, [user, isLoading, isProcessing, router, searchParams]);
 
     return (
         <main className="flex h-screen w-full items-center justify-center bg-background">
